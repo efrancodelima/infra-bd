@@ -1,5 +1,10 @@
+variable "aws_region" {
+  description = "AWS region"
+  type = string
+}
+
 variable "db_username" {
-  description = "Nome de usuário do banco de dados"
+  description = "Usuário do banco de dados"
   type        = string
 }
 

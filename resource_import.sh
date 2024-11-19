@@ -26,10 +26,11 @@ get_first_subnet_id() {
   "Name=tag:Name,Values=${subnet_name}" --query "Subnets[0].SubnetId" --output text
 }
 
-get_instance_id() {
+get_aurora_instance_id() {
   local instance_name=$1
+  local instance_index=$2
   aws rds describe-db-instances --query \
-  "DBInstances[?DBClusterIdentifier=='${instance_name}'].DBInstanceIdentifier" --output text
+  "DBInstances[?DBClusterIdentifier=='${instance_name}'].DBInstanceIdentifier | [${instance_index}]" --output text
 }
 
 get_first_security_group_id() {
@@ -48,10 +49,10 @@ get_first_subnet_group_id() {
 import_resource "aws_rds_cluster" "tf_aurora_cluster" "lanchonete-aurora-cluster"
 
 # Importa a instância do cluster
-AURORA_INSTANCE_ID=$(get_instance_id "lanchonete-aurora-cluster")
+AURORA_INSTANCE_ID=$(get_aurora_instance_id "lanchonete-aurora-cluster" "0")
 import_resource "aws_rds_cluster_instance" "tf_aurora_instance" "$AURORA_INSTANCE_ID"
 
-# importa o Security Group
+# Importa o Security Group
 SECURITY_GROUP_ID=$(get_first_security_group_id "aurora-security-group")
 import_resource "aws_security_group" "tf_aurora_security_group" $SECURITY_GROUP_ID
 

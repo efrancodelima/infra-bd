@@ -1,7 +1,5 @@
 #!/bin/bash
 
-RESOURCE_NOT_FOUND="Recurso não encontrado"
-
 import_resource() {
   local resource_type=$1
   local resource_name=$2
@@ -36,16 +34,9 @@ get_aurora_instance_id() {
 }
 
 get_first_security_group_id() {
-  local security_group_name=$1
-  local group_id
-  group_id=$(aws ec2 describe-security-groups \
-    --filters "Name=group-name,Values=${security_group_name}" --query "SecurityGroups[0].GroupId" --output text)
-
-  if [ -z "$group_id" ]; then
-    echo "$RESOURCE_NOT_FOUND"
-  else
-    echo "$group_id"
-  fi
+  local security_group_name=$1  
+  aws ec2 describe-security-groups --filters \
+  "Name=group-name,Values=${security_group_name}" --query "SecurityGroups[0].GroupId" --output text
 }
 
 
@@ -64,7 +55,7 @@ import_resource "aws_rds_cluster_instance" "tf_aurora_instance" "$AURORA_INSTANC
 
 # Importa o Security Group
 SECURITY_GROUP_ID=$(get_first_security_group_id "aurora-security-group")
-if [ "$SECURITY_GROUP_ID" == "$RESOURCE_NOT_FOUND" ]; then
+if [ "$SECURITY_GROUP_ID" == "None" ]; then
   echo "Security group não encontrado."
 else
   import_resource "aws_security_group" "tf_aurora_security_group" $SECURITY_GROUP_ID

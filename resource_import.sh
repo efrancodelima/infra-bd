@@ -67,7 +67,7 @@ fi
 
 # Importa o Subnet Group
 SUBNET_GROUP_ID=$(get_first_subnet_group_id "aurora-subnet-group")
-if [ "$SUBNET_GROUP_ID" == "None" ]; then
+if [ "$SUBNET_GROUP_ID" == "" ]; then
   echo "Recurso 'aws_db_subnet_group' não encontrado."
 else
   import_resource "aws_db_subnet_group" "tf_subnet_group" "$SUBNET_GROUP_ID"

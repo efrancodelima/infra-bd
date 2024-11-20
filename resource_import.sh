@@ -15,6 +15,21 @@ SECURITY_GROUP_ID="sg-06ac17d92f40b0cd5"
 SUBNET_GROUP_NAME="aurora-subnet-group"
 VPC_ID="vpc-0ea4cbbd6e92e3abe"
 
+# Função auxiliar
+import_resource() {
+  local resource_type=$1
+  local resource_name=$2
+  local resource_id=$3
+
+  terraform import \
+  -var="aws_region=$AWS_REGION" \
+  -var="aws_zone_1=$AWS_ZONE_1" \
+  -var="aws_zone_2=$AWS_ZONE_2" \
+  -var="db_username=$DB_USERNAME" \
+  -var="db_password=$DB_PASSWORD" \
+  "$resource_type.$resource_name" "$resource_id" || true
+}
+
 # Importa o cluster Aurora
 import_resource "aws_rds_cluster" "tf_aurora_cluster" "${AURORA_CLUSTER_NAME}"
 
@@ -52,18 +67,3 @@ import_resource "aws_db_subnet_group" "tf_subnet_group" "${SUBNET_GROUP_NAME}"
 
 # Importa a VPC
 import_resource "aws_vpc" "tf_vpc" "${VPC_ID}"
-
-# Função auxiliar
-import_resource() {
-  local resource_type=$1
-  local resource_name=$2
-  local resource_id=$3
-
-  terraform import \
-  -var="aws_region=$AWS_REGION" \
-  -var="aws_zone_1=$AWS_ZONE_1" \
-  -var="aws_zone_2=$AWS_ZONE_2" \
-  -var="db_username=$DB_USERNAME" \
-  -var="db_password=$DB_PASSWORD" \
-  "$resource_type.$resource_name" "$resource_id" || true
-}

@@ -1,5 +1,59 @@
 #!/bin/bash
 
+# Constantes
+AURORA_CLUSTER_NAME="lanchonete-aurora-cluster"
+AURORA_INSTANCE_NAME="lanchonete-aurora-cluster-0"
+DHCP_OPTIONS_ID="dopt-0c8fc57b079c91172"
+INTERNET_GATEWAY_ID="igw-0a0f387d0f166b3a6"
+PRIVATE_SUBNET_ID_0="subnet-0a35b1afb7b19cda1"
+PRIVATE_SUBNET_ID_1="subnet-0b03f410da640c4cb"
+PUBLIC_SUBNET_ID_0="subnet-04210519054c41980"
+PUBLIC_SUBNET_ID_1="subnet-0dcb9a941b96ae94b"
+ROUTE_TABLE_ID="rtb-0d2b24549dac7dc8e"
+ROUTE="0.0.0.0/0"
+SECURITY_GROUP_ID="sg-06ac17d92f40b0cd5"
+SUBNET_GROUP_NAME="aurora-subnet-group"
+VPC_ID="vpc-0ea4cbbd6e92e3abe"
+
+# Importa o cluster Aurora
+import_resource "aws_rds_cluster" "tf_aurora_cluster" "${AURORA_CLUSTER_NAME}"
+
+# Importa a instância do cluster
+import_resource "aws_rds_cluster_instance" "tf_aurora_instance" "${AURORA_INSTANCE_NAME}"
+
+# Importa o DHCP Options Association
+import_resource "aws_vpc_dhcp_options_association" "tf_dhcp_options_association" "${VPC_ID}/${DHCP_OPTIONS_ID}"
+
+# Importa o DHCP Options
+import_resource "aws_vpc_dhcp_options" "tf_dhcp_options" "${DHCP_OPTIONS_ID}"
+
+# Importa o Internet Gateway
+import_resource "aws_internet_gateway" "tf_internet_gateway" "${INTERNET_GATEWAY_ID}"
+
+# Importa as subnets
+import_resource "aws_subnet" "tf_public_subnet[0]" "${PUBLIC_SUBNET_ID_0}"
+import_resource "aws_subnet" "tf_public_subnet[1]" "${PUBLIC_SUBNET_ID_1}"
+import_resource "aws_subnet" "tf_private_subnet[0]" "${PRIVATE_SUBNET_ID_0}"
+import_resource "aws_subnet" "tf_private_subnet[1]" "${PRIVATE_SUBNET_ID_1}"
+
+# Importa a Route Table
+import_resource "aws_route_table" "tf_route_table" "${ROUTE_TABLE_ID}"
+
+# Importa a Route
+import_resource "aws_route_table" "tf_route_table" "${ROUTE_TABLE_ID}"
+import_resource "aws_route" "tf_route" "${ROUTE_TABLE_ID}_${ROUTE}"
+
+
+# Importa o Security Group
+import_resource "aws_security_group" "tf_aurora_security_group" "${SECURITY_GROUP_ID}"
+
+# Importa o Subnet Group
+import_resource "aws_db_subnet_group" "tf_subnet_group" "${SUBNET_GROUP_NAME}"
+
+# Importa a VPC
+import_resource "aws_vpc" "tf_vpc" "${VPC_ID}"
+
+# Função auxiliar
 import_resource() {
   local resource_type=$1
   local resource_name=$2
@@ -13,145 +67,3 @@ import_resource() {
   -var="db_password=$DB_PASSWORD" \
   "$resource_type.$resource_name" "$resource_id" || true
 }
-
-check_rds_cluster_exists() {
-  local cluster_identifier=$1
-  # TODO testar esse comando
-  aws rds describe-db-clusters \
-  --query "DBClusters[?DBClusterIdentifier=='${cluster_identifier}'] | [0].DBClusterIdentifier" \
-  --output text
-}
-
-get_aurora_instance_id() {
-  local instance_name=$1
-  local instance_index=$2
-  # TODO testar esse comando
-  aws rds describe-db-instances \
-  --query "DBInstances[?DBClusterIdentifier=='${instance_name}'].DBInstanceIdentifier | [${instance_index}]" \
-  --output text
-}
-
-get_first_security_group_id() {
-  local security_group_name=$1  
-  # TODO testar esse comando
-  aws ec2 describe-security-groups \
-  --filters "Name=group-name,Values=${security_group_name}" \
-  --query "SecurityGroups[0].GroupId" \
-  --output text
-}
-
-get_first_vpc_id() {
-  local vpc_name=$1
-  aws ec2 describe-vpcs \
-  --filters "Name=tag:Name,Values=${vpc_name}" \
-  --query "Vpcs[0].VpcId" \
-  --output text
-}
-
-get_first_subnet_id() {
-  local subnet_name=$1
-  aws ec2 describe-subnets \
-  --filters "Name=tag:Name,Values=${subnet_name}" \
-  --query "Subnets[0].SubnetId" \
-  --output text
-}
-
-get_vcp_id_from_db_subnet_group() {
-  local subnet_group_name=$1
-  aws rds describe-db-subnet-groups \
-  --query "DBSubnetGroups[?DBSubnetGroupName=='${subnet_group_name}'] | [0].VpcId" \
-  --output text
-}
-
-delete_subnet_group() {
-  local subnet_group_name=$1
-  aws rds delete-db-subnet-group --db-subnet-group-name "$subnet_group_name"
-  
-  if [ $? -eq 0 ]; then
-    echo "DB Subnet Group '$subnet_group_name' excluído com sucesso."
-  else
-    echo "Falha ao excluir o DB Subnet Group '$subnet_group_name'."
-  fi
-}
-
-# Importa o cluster Aurora
-CLUSTER_IDENTIFIER="lanchonete-aurora-cluster"
-CLUSTER_EXISTS=$(check_rds_cluster_exists "$CLUSTER_IDENTIFIER")
-if [ "$CLUSTER_EXISTS" == "None" ]; then
-  echo "Recurso aws_rds_cluster.tf_aurora_cluster não encontrado."
-else
-  import_resource "aws_rds_cluster" "tf_aurora_cluster" "$CLUSTER_IDENTIFIER"
-fi
-
-# Importa a instância do cluster
-AURORA_INSTANCE_ID=$(get_aurora_instance_id "lanchonete-aurora-cluster" "0")
-if [ "$AURORA_INSTANCE_ID" == "None" ]; then
-  echo "Recurso aws_rds_cluster_instance.tf_aurora_instance não encontrado."
-else
-  import_resource "aws_rds_cluster_instance" "tf_aurora_instance" "$AURORA_INSTANCE_ID"
-fi
-
-# Importa o Security Group
-SECURITY_GROUP_ID=$(get_first_security_group_id "aurora-security-group")
-if [ "$SECURITY_GROUP_ID" == "None" ]; then
-  echo "Recurso aws_security_group.tf_aurora_security_group não encontrado."
-else
-  import_resource "aws_security_group" "tf_aurora_security_group" $SECURITY_GROUP_ID
-fi
-
-# Importa a VPC
-VPC_ID=$(get_first_vpc_id "lanchonete-vpc")
-if [ "$VPC_ID" == "None" ]; then
-  echo "Recurso aws_vpc.tf_vpc não encontrado."
-else
-  import_resource "aws_vpc" "tf_vpc" "vpc-0ea4cbbd6e92e3abe"
-fi
-
-# Importa as subnets
-PUBLIC_SUBNET_0_ID=$(get_first_subnet_id "lanchonete-public-subnet-0")
-if [ "$PUBLIC_SUBNET_0_ID" == "None" ]; then
-  echo "Recurso aws_subnet.tf_public_subnet[0] não encontrado."
-else
-  import_resource "aws_subnet" "tf_public_subnet[0]" "$PUBLIC_SUBNET_0_ID"
-fi
-
-PUBLIC_SUBNET_1_ID=$(get_first_subnet_id "lanchonete-public-subnet-1")
-if [ "$PUBLIC_SUBNET_1_ID" == "None" ]; then
-  echo "Recurso aws_subnet.tf_public_subnet[1] não encontrado."
-else
-  import_resource "aws_subnet" "tf_public_subnet[1]" "$PUBLIC_SUBNET_1_ID"
-fi
-
-PRIVATE_SUBNET_0_ID=$(get_first_subnet_id "lanchonete-private-subnet-0")
-if [ "$PRIVATE_SUBNET_0_ID" == "None" ]; then
-  echo "Recurso aws_subnet.tf_private_subnet[0] não encontrado."
-else
-  import_resource "aws_subnet" "tf_private_subnet[0]" "$PRIVATE_SUBNET_0_ID"
-fi
-
-PRIVATE_SUBNET_1_ID=$(get_first_subnet_id "lanchonete-private-subnet-1")
-if [ "$PRIVATE_SUBNET_1_ID" == "None" ]; then
-  echo "Recurso aws_subnet.tf_private_subnet[1] não encontrado."
-else
-  import_resource "aws_subnet" "tf_private_subnet[1]" "$PRIVATE_SUBNET_1_ID"
-fi
-
-# Importa o Subnet Group
-SUBNET_GROUP_NAME="aurora-subnet-group"
-
-# Pega o id da VCP do subnet group
-SUBNET_GROUP_VCP_ID=$(get_vcp_id_from_db_subnet_group $SUBNET_GROUP_NAME)
-
-# Se o id é none, então o subnet group não existe
-if [ "$SUBNET_GROUP_VCP_ID" == "None" ]; then
-  echo "Recurso aws_db_subnet_group.tf_subnet_group não encontrado."
-else
-  # Se o id é igual ao da VCP deste projeto, importa o subnet group
-  if [ "$SUBNET_GROUP_VCP_ID" == "$VPC_ID" ]; then
-    import_resource "aws_db_subnet_group" "tf_subnet_group" "$SUBNET_GROUP_NAME"  
-  
-  # Caso contrário, deleta o subnet group
-  else
-    delete_subnet_group "$SUBNET_GROUP_NAME"
-  fi
-fi

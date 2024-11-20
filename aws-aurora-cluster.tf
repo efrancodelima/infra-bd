@@ -1,7 +1,7 @@
 resource "aws_rds_cluster" "tf_aurora_cluster" {
   cluster_identifier      = "lanchonete-aurora-cluster"
   engine                  = "aurora-mysql"
-  engine_version          = "8.0.mysql_aurora.3.06.0"
+  engine_version          = "8.0.mysql_aurora.3.05.2"
   availability_zones      = [var.aws_zone_1, var.aws_zone_2]
   database_name           = "lanchonete"
   master_username         = var.db_username

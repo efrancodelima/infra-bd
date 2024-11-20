@@ -1,0 +1,20 @@
+{
+    "InternetGateways": [
+        {
+            "Attachments": [
+                {
+                    "State": "available",
+                    "VpcId": "vpc-0ea4cbbd6e92e3abe"
+                }
+            ],
+            "InternetGatewayId": "igw-0a0f387d0f166b3a6",
+            "OwnerId": "445567101225",
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "lanchonete_internet-gateway"
+                }
+            ]
+        }
+    ]
+}

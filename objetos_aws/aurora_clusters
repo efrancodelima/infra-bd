@@ -1,0 +1,65 @@
+{
+    "DBClusters": [
+        {
+            "AllocatedStorage": 1,
+            "AvailabilityZones": [
+                "us-east-1f",
+                "us-east-1b",
+                "us-east-1a"
+            ],
+            "BackupRetentionPeriod": 1,
+            "DBClusterIdentifier": "lanchonete-aurora-cluster",
+            "DBClusterParameterGroup": "default.aurora-mysql8.0",
+            "DBSubnetGroup": "aurora-subnet-group",
+            "Status": "available",
+            "EarliestRestorableTime": "2024-11-20T20:02:26.867000+00:00",
+            "Endpoint": "lanchonete-aurora-cluster.cluster-c5g2k0icup68.us-east-1.rds.amazonaws.com",
+            "ReaderEndpoint": "lanchonete-aurora-cluster.cluster-ro-c5g2k0icup68.us-east-1.rds.amazonaws.com",
+            "MultiAZ": false,
+            "Engine": "aurora-mysql",
+            "EngineVersion": "8.0.mysql_aurora.3.05.2",
+            "LatestRestorableTime": "2024-11-20T20:15:05.149000+00:00",
+            "Port": 3306,
+            "MasterUsername": "admin",
+            "PreferredBackupWindow": "10:06-10:36",
+            "PreferredMaintenanceWindow": "sun:05:12-sun:05:42",
+            "ReadReplicaIdentifiers": [],
+            "DBClusterMembers": [
+                {
+                    "DBInstanceIdentifier": "lanchonete-aurora-cluster-instance-1",
+                    "IsClusterWriter": true,
+                    "DBClusterParameterGroupStatus": "in-sync",
+                    "PromotionTier": 1
+                }
+            ],
+            "VpcSecurityGroups": [
+                {
+                    "VpcSecurityGroupId": "sg-06ac17d92f40b0cd5",
+                    "Status": "active"
+                }
+            ],
+            "HostedZoneId": "Z2R2ITUGPM61AM",
+            "StorageEncrypted": true,
+            "KmsKeyId": "arn:aws:kms:us-east-1:445567101225:key/0e54b723-d432-489c-982f-66eab6272861",
+            "DbClusterResourceId": "cluster-ZBE3222TTXDPF42EVME36OLTQI",
+            "DBClusterArn": "arn:aws:rds:us-east-1:445567101225:cluster:lanchonete-aurora-cluster",
+            "AssociatedRoles": [],
+            "IAMDatabaseAuthenticationEnabled": false,
+            "ClusterCreateTime": "2024-11-20T20:01:46.346000+00:00",
+            "EngineMode": "provisioned",
+            "DeletionProtection": false,
+            "HttpEndpointEnabled": false,
+            "ActivityStreamStatus": "stopped",
+            "CopyTagsToSnapshot": true,
+            "CrossAccountClone": false,
+            "DomainMemberships": [],
+            "TagList": [],
+            "AutoMinorVersionUpgrade": true,
+            "MonitoringInterval": 60,
+            "MonitoringRoleArn": "arn:aws:iam::445567101225:role/rds-monitoring-role",
+            "NetworkType": "IPV4",
+            "LocalWriteForwardingStatus": "disabled",
+            "EngineLifecycleSupport": "open-source-rds-extended-support-disabled"
+        }
+    ]
+}

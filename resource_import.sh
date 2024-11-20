@@ -37,7 +37,7 @@ import_resource "aws_rds_cluster" "tf_aurora_cluster" "${AURORA_CLUSTER_NAME}"
 import_resource "aws_rds_cluster_instance" "tf_aurora_instance" "${AURORA_INSTANCE_NAME}"
 
 # Importa o DHCP Options Association
-import_resource "aws_vpc_dhcp_options_association" "tf_dhcp_options_association" "${VPC_ID}/${DHCP_OPTIONS_ID}"
+# import_resource "aws_vpc_dhcp_options_association" "tf_dhcp_options_association" "${VPC_ID}/${DHCP_OPTIONS_ID}"
 
 # Importa o DHCP Options
 import_resource "aws_vpc_dhcp_options" "tf_dhcp_options" "${DHCP_OPTIONS_ID}"
@@ -55,7 +55,6 @@ import_resource "aws_subnet" "tf_private_subnet[1]" "${PRIVATE_SUBNET_ID_1}"
 import_resource "aws_route_table" "tf_route_table" "${ROUTE_TABLE_ID}"
 
 # Importa a Route
-import_resource "aws_route_table" "tf_route_table" "${ROUTE_TABLE_ID}"
 import_resource "aws_route" "tf_route" "${ROUTE_TABLE_ID}_${ROUTE}"
 
 

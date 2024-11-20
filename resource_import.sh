@@ -17,41 +17,61 @@ import_resource() {
 check_rds_cluster_exists() {
   local cluster_identifier=$1
   # TODO testar esse comando
-  aws rds describe-db-clusters --query "DBClusters[?DBClusterIdentifier=='${cluster_identifier}'] | [0].DBClusterIdentifier" --output text
+  aws rds describe-db-clusters \
+  --query "DBClusters[?DBClusterIdentifier=='${cluster_identifier}'] | [0].DBClusterIdentifier" \
+  --output text
 }
 
 get_aurora_instance_id() {
   local instance_name=$1
   local instance_index=$2
   # TODO testar esse comando
-  aws rds describe-db-instances --query \
-  "DBInstances[?DBClusterIdentifier=='${instance_name}'].DBInstanceIdentifier | [${instance_index}]" --output text
+  aws rds describe-db-instances \
+  --query "DBInstances[?DBClusterIdentifier=='${instance_name}'].DBInstanceIdentifier | [${instance_index}]" \
+  --output text
 }
 
 get_first_security_group_id() {
   local security_group_name=$1  
   # TODO testar esse comando
-  aws ec2 describe-security-groups --filters \
-  "Name=group-name,Values=${security_group_name}" --query "SecurityGroups[0].GroupId" --output text
-}
-
-
-check_subnet_group_exists() {
-  local subnet_group_name=$1
-  aws rds describe-db-subnet-groups --query \
-  "DBSubnetGroups[?DBSubnetGroupName=='${subnet_group_name}'] | [0].DBSubnetGroupName" --output text
+  aws ec2 describe-security-groups \
+  --filters "Name=group-name,Values=${security_group_name}" \
+  --query "SecurityGroups[0].GroupId" \
+  --output text
 }
 
 get_first_vpc_id() {
   local vpc_name=$1
-  aws ec2 describe-vpcs --filters \
-  "Name=tag:Name,Values=${vpc_name}" --query "Vpcs[0].VpcId" --output text
+  aws ec2 describe-vpcs \
+  --filters "Name=tag:Name,Values=${vpc_name}" \
+  --query "Vpcs[0].VpcId" \
+  --output text
 }
 
 get_first_subnet_id() {
   local subnet_name=$1
-  aws ec2 describe-subnets --filters \
-  "Name=tag:Name,Values=${subnet_name}" --query "Subnets[0].SubnetId" --output text
+  aws ec2 describe-subnets \
+  --filters "Name=tag:Name,Values=${subnet_name}" \
+  --query "Subnets[0].SubnetId" \
+  --output text
+}
+
+get_vcp_id_from_db_subnet_group() {
+  local subnet_group_name=$1
+  aws rds describe-db-subnet-groups \
+  --query "DBSubnetGroups[?DBSubnetGroupName=='${subnet_group_name}'] | [0].VpcId" \
+  --output text
+}
+
+delete_subnet_group() {
+  local subnet_group_name=$1
+  aws rds delete-db-subnet-group --db-subnet-group-name "$subnet_group_name"
+  
+  if [ $? -eq 0 ]; then
+    echo "DB Subnet Group '$subnet_group_name' excluído com sucesso."
+  else
+    echo "Falha ao excluir o DB Subnet Group '$subnet_group_name'."
+  fi
 }
 
 # Importa o cluster Aurora
@@ -77,15 +97,6 @@ if [ "$SECURITY_GROUP_ID" == "None" ]; then
   echo "Recurso aws_security_group.tf_aurora_security_group não encontrado."
 else
   import_resource "aws_security_group" "tf_aurora_security_group" $SECURITY_GROUP_ID
-fi
-
-# Importa o Subnet Group
-SUBNET_GROUP_NAME="aurora-subnet-group"
-SUBNET_GROUP_EXISTS=$(check_subnet_group_exists $SUBNET_GROUP_NAME)
-if [ "$SUBNET_GROUP_EXISTS" == "None" ]; then
-  echo "Recurso aws_db_subnet_group.tf_subnet_group não encontrado."
-else
-  import_resource "aws_db_subnet_group" "tf_subnet_group" "$SUBNET_GROUP_NAME"
 fi
 
 # Importa a VPC
@@ -123,4 +134,24 @@ if [ "$PRIVATE_SUBNET_1_ID" == "None" ]; then
   echo "Recurso aws_subnet.tf_private_subnet[1] não encontrado."
 else
   import_resource "aws_subnet" "tf_private_subnet[1]" "$PRIVATE_SUBNET_1_ID"
+fi
+
+# Importa o Subnet Group
+SUBNET_GROUP_NAME="aurora-subnet-group"
+
+# Pega o id da VCP do subnet group
+SUBNET_GROUP_VCP_ID=$(get_vcp_id_from_db_subnet_group $SUBNET_GROUP_NAME)
+
+# Se o id é none, então o subnet group não existe
+if [ "$SUBNET_GROUP_VCP_ID" == "None" ]; then
+  echo "Recurso aws_db_subnet_group.tf_subnet_group não encontrado."
+else
+  # Se o id é igual ao da VCP deste projeto, importa o subnet group
+  if [ "$SUBNET_GROUP_VCP_ID" == "$VPC_ID" ]; then
+    import_resource "aws_db_subnet_group" "tf_subnet_group" "$SUBNET_GROUP_NAME"  
+  
+  # Caso contrário, deleta o subnet group
+  else
+    delete_subnet_group "$SUBNET_GROUP_NAME"
+  fi
 fi

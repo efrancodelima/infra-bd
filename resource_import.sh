@@ -36,11 +36,10 @@ get_first_security_group_id() {
 }
 
 
-get_first_subnet_group_id() {
+check_subnet_group_exists() {
   local subnet_group_name=$1
-  # TODO testar esse comando
-  aws rds describe-db-subnet-groups \
-  --query "DBSubnetGroups[?DBSubnetGroupName=='${subnet_group_name}'].DBSubnetGroupArn" --output text
+  aws rds describe-db-subnet-groups --query \
+  "DBSubnetGroups[?DBSubnetGroupName=='${subnet_group_name}'] | [0].DBSubnetGroupName" --output text
 }
 
 get_first_vpc_id() {
@@ -81,16 +80,17 @@ else
 fi
 
 # Importa o Subnet Group
-SUBNET_GROUP_ID=$(get_first_subnet_group_id "aurora-subnet-group")
-if [ "$SUBNET_GROUP_ID" == "" ]; then
+SUBNET_GROUP_NAME="aurora-subnet-group"
+SUBNET_GROUP_EXISTS=$(check_subnet_group_exists $SUBNET_GROUP_NAME)
+if [ "$SUBNET_GROUP_EXISTS" == "None" ]; then
   echo "Recurso aws_db_subnet_group.tf_subnet_group não encontrado."
 else
-  import_resource "aws_db_subnet_group" "tf_subnet_group" "$SUBNET_GROUP_ID"
+  import_resource "aws_db_subnet_group" "tf_subnet_group" "$SUBNET_GROUP_NAME"
 fi
 
 # Importa a VPC
 VPC_ID=$(get_first_vpc_id "lanchonete-vpc")
-if [ "$SUBNET_GROUP_ID" == "None" ]; then
+if [ "$VPC_ID" == "None" ]; then
   echo "Recurso aws_vpc.tf_vpc não encontrado."
 else
   import_resource "aws_vpc" "tf_vpc" "$VPC_ID"

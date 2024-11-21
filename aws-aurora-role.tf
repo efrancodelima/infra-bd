@@ -1,5 +1,5 @@
 resource "aws_iam_role" "tf_aurora_role" {
-  name = "aurora-role"
+  name = "lanchonete-aurora-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -11,8 +11,4 @@ resource "aws_iam_role" "tf_aurora_role" {
       }
     }]
   })
-
-  tags = {
-    Name = "aurora-rds-role"
-  }
 }

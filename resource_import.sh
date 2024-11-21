@@ -10,10 +10,10 @@ PRIVATE_SUBNET_ID_0="subnet-0a35b1afb7b19cda1"
 PRIVATE_SUBNET_ID_1="subnet-0b03f410da640c4cb"
 PUBLIC_SUBNET_ID_0="subnet-04210519054c41980"
 PUBLIC_SUBNET_ID_1="subnet-0dcb9a941b96ae94b"
-ROLE_NAME="aurora-role"
+ROLE_NAME="lanchonete-aurora-role"
 ROUTE_TABLE_ID="rtb-0d2b24549dac7dc8e"
 SECURITY_GROUP_ID="sg-06ac17d92f40b0cd5"
-SUBNET_GROUP_NAME="aurora-subnet-group"
+SUBNET_GROUP_NAME="lanchonete-aurora-subnet-group"
 VPC_ID="vpc-0ea4cbbd6e92e3abe"
 
 # Função auxiliar

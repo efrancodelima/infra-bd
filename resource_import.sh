@@ -36,9 +36,6 @@ import_resource "aws_rds_cluster" "tf_aurora_cluster" "${AURORA_CLUSTER_NAME}"
 # Importa a instância do cluster
 import_resource "aws_rds_cluster_instance" "tf_aurora_instance" "${AURORA_INSTANCE_NAME}"
 
-# Importa o DHCP Options Association
-# import_resource "aws_vpc_dhcp_options_association" "tf_dhcp_options_association" "${VPC_ID}/${DHCP_OPTIONS_ID}"
-
 # Importa o DHCP Options
 import_resource "aws_vpc_dhcp_options" "tf_dhcp_options" "${DHCP_OPTIONS_ID}"
 

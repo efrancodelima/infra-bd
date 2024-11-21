@@ -60,8 +60,8 @@ import_resource "aws_iam_role" "tf_aurora_role" "${ROLE_NAME}"
 import_resource "aws_route_table" "tf_route_table" "${ROUTE_TABLE_ID}"
 
 # Importa as associações entre a route table e as subnets
-terraform import aws_route_table_association.tf_route_table_association_1 ${ROUTE_TABLE_ID}/${PUBLIC_SUBNET_ID_0}
-terraform import aws_route_table_association.tf_route_table_association_1 ${ROUTE_TABLE_ID}/${PUBLIC_SUBNET_ID_1}
+terraform import aws_route_table_association.tf_rt_assoc_1 ${ROUTE_TABLE_ID}/${PUBLIC_SUBNET_ID_0}
+terraform import aws_route_table_association.tf_rt_assoc_2 ${ROUTE_TABLE_ID}/${PUBLIC_SUBNET_ID_1}
 
 # Importa o security group
 import_resource "aws_security_group" "tf_aurora_security_group" "${SECURITY_GROUP_ID}"

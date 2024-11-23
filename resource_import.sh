@@ -21,7 +21,7 @@ AURORA_CLUSTER_NAME="lanchonete-aurora-cluster"
 AURORA_INSTANCE_NAME="lanchonete-aurora-cluster-0"
 ROLE_NAME="lanchonete-aurora-role"
 POLICY_NAME="AmazonRDSFullAccess"
-SECURITY_GROUP_ID="sg-06ac17d92f40b0cd5"
+SECURITY_GROUP_ID="sg-029d2fafc37f26157"
 SUBNET_GROUP_NAME="lanchonete-aurora-subnet-group"
 
 # Importa o cluster aurora

@@ -76,7 +76,7 @@ import_resource "aws_route_table_association" "tf_rt_assoc_2" "${PUBLIC_SUBNET_I
 import_resource "aws_vpc_dhcp_options" "tf_dhcp_options" "${DHCP_OPTIONS_ID}"
 
 # Importa o DHCP options associations
-import_resource "aws_vpc_dhcp_options_association" "tf_dhcp_options_association" "${VCP_ID}"
+import_resource "aws_vpc_dhcp_options_association" "tf_dhcp_options_association" "${VPC_ID}"
 
 # Importa o internet gateway
 import_resource "aws_internet_gateway" "tf_internet_gateway" "${INTERNET_GATEWAY_ID}"

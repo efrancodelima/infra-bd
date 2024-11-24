@@ -2,10 +2,10 @@
 resource "aws_db_subnet_group" "tf_subnet_group" {
   name       = "lanchonete-aurora-subnet-group"
   subnet_ids = [
-    aws_subnet.tf_public_subnet[0].id,
-    aws_subnet.tf_public_subnet[1].id,
-    aws_subnet.tf_private_subnet[0].id,
-    aws_subnet.tf_private_subnet[1].id
+    subnet-070df2dd859ac9173,
+    subnet-013f3649edb4c051b,
+    subnet-077d0b4dda8063a54,
+    subnet-0a2e35524708401dd
   ]
 }
 

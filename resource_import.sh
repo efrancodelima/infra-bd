@@ -16,7 +16,8 @@ import_resource() {
 
 # Constantes
 AURORA_CLUSTER_NAME="lanchonete-aurora-cluster"
-AURORA_INSTANCE_NAME="lanchonete-aurora-cluster-0"
+AURORA_CLUSTER_INSTANCE_NAME="lanchonete-aurora-cluster-instance"
+AURORA_DB_INSTANCE_NAME="lanchonete-aurora-cluster-instance-1"
 ROLE_NAME="lanchonete-aurora-role"
 POLICY_NAME="AmazonRDSFullAccess"
 SECURITY_GROUP_ID="sg-029d2fafc37f26157"
@@ -26,7 +27,10 @@ SUBNET_GROUP_NAME="lanchonete-aurora-subnet-group"
 import_resource "aws_rds_cluster" "tf_aurora_cluster" "${AURORA_CLUSTER_NAME}"
 
 # Importa a instância do cluster
-import_resource "aws_rds_cluster_instance" "tf_aurora_instance" "${AURORA_INSTANCE_NAME}"
+import_resource "aws_rds_cluster_instance" "tf_aurora_instance" "${AURORA_CLUSTER_INSTANCE_NAME}"
+
+# Importa a instância db
+import_resource "aws_rds_cluster_instance" "tf_aurora_instance" "${AURORA_DB_INSTANCE_NAME}"
 
 # Importa a role usada no cluster aurora
 import_resource "aws_iam_role" "tf_aurora_role" "${ROLE_NAME}"

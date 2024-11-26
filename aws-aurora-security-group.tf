@@ -1,6 +1,6 @@
 resource "aws_security_group" "tf_aurora_security_group" {
-  vpc_id = "vpc-0619b2c1d01be3a72"
   name   = "lanchonete-aurora-security-group"
+  vpc_id = var.vpc_id
   
   ingress {
     from_port   = 3306

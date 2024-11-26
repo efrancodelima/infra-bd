@@ -11,6 +11,5 @@ resource "aws_rds_cluster_instance" "tf_aurora_cluster_instance" {
   publicly_accessible = false
   
   auto_minor_version_upgrade = true
-  auto_major_version_upgrade = false
   apply_immediately   = true
 }

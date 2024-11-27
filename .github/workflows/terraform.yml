@@ -47,7 +47,4 @@ jobs:
 
       - name: Terraform Apply
         run: |
-          terraform apply \
-          -var="db_username=${{ secrets.DB_USERNAME }}" \
-          -var="db_password=${{ secrets.DB_PASSWORD }}" \
-          "tfplan" -auto-approve
+          terraform apply "tfplan" -auto-approve

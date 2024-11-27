@@ -12,4 +12,8 @@ resource "aws_rds_cluster_instance" "tf_aurora_cluster_instance" {
   
   auto_minor_version_upgrade = true
   apply_immediately   = true
+
+  depends_on = [
+    aws_rds_cluster.tf_aurora_cluster
+  ]
 }

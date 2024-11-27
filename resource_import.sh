@@ -13,7 +13,7 @@ import_resource() {
 
 # Constantes
 AURORA_CLUSTER_NAME="lanchonete-aurora-cluster"
-AURORA_CLUSTER_INSTANCE_NAME="lanchonete-aurora-cluster-instance"
+AURORA_CLUSTER_INSTANCE_NAME="lanchonete-aurora-cluster-instance-1"
 ROLE_NAME="lanchonete-aurora-role"
 POLICY_NAME="AmazonRDSFullAccess"
 SECURITY_GROUP_ID="sg-0b9ded624a8d10261"

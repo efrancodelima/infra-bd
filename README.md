@@ -12,8 +12,8 @@ Link do projeto no GitHub:
 # Índice
 
 - [Objetivos](#objetivos)
-- [Requisitos do negócio](#requisitos-do-negocio)
-  - [API's web](#apis-web)
+- [Requisitos](#requisitos)
+  - [Aplicação](#aplicacao)
   - [Arquitetura](#arquitetura)
   - [Pipeline](#pipeline)
 - [Banco de dados](#banco-de-dados)
@@ -26,11 +26,11 @@ Link do projeto no GitHub:
 
 Desenvolver um sistema para uma lanchonete local em fase de expansão. O sistema deverá realizar o controle dos pedidos, além de outras funções correlatas, conforme especificado no Tech Challenge.
 
-## Requisitos do negócio
+## Requisitos
 
-### API's web
+### Aplicação
 
-A aplicação deverá oferecer a seguinte API para consumo:
+A aplicação deverá oferecer a seguinte API web para consumo:
 
 Cliente
 

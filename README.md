@@ -12,9 +12,15 @@ Link do projeto no GitHub:
 # Índice
 
 - [Objetivos](#objetivos)
-- [Requisitos do negócio](#requisitos-do-negócio)
-- [Instruções para executar a aplicação](#instruções-para-executar-a-aplicação)
-- [Estrutura do projeto](#estrutura-do-projeto)
+- [Requisitos do negócio](#requisitos-do-negocio)
+- [API's web](#apis-web)
+- [Arquitetura](#arquitetura)
+- [Pipeline](#pipeline)
+- [Banco de dados](#banco-de-dados)
+- [Escolha e justificativa](#escolha-e-justificativa)
+- [Documentação](#documentacao)
+- [Modelo conceitual](#modelo-conceitual)
+- [Modelo lógico](#modelo-logico)
 
 ## Objetivos
 
@@ -23,6 +29,7 @@ Desenvolver um sistema para uma lanchonete local em fase de expansão. O sistema
 ## Requisitos do negócio
 
 ### API's web
+
 A aplicação deverá oferecer a seguinte API para consumo:
 
 Cliente
@@ -49,7 +56,7 @@ Pedido
 
 Arquitetura do software: utilizar a Clean Architecture.
 
-Arquitetura da infra: utilizar o kubernetes para rodar a aplicação, que deverá rodar na nuvem utilizando os serviços serverless. 
+Arquitetura da infra: utilizar o kubernetes para rodar a aplicação, que deverá rodar na nuvem utilizando os serviços serverless.
 O banco de dados do projeto deverá ser uma solução oferecida pela nuvem escolhida.
 
 ### Pipeline
@@ -66,6 +73,7 @@ Cada parte tem um repositório separado no GitHub, conforme mencionado no iníci
 Cada repositório deverá acionar o respectivo pipeline sempre que a branch main for alterada, realizando o deploy na nuvem escolhida.
 
 ## Banco de dados
+
 ### Escolha e justificativa
 
 Escolhemos trabalhar com o modelo relacional, principalmente pela consistência e integridade dos dados, características fundamentais para um controle preciso dos pedidos e dos pagamentos da lanchonete.
@@ -87,6 +95,7 @@ O diagrama abaixo foi feito utilizando o software brModelo.
 ![Diagrama Entidade Relacionamento representando o Modelo Conceitual do banco de dados](./assets/modelo-conceitual.png)
 
 Alguns pontos a destacar nesse diagrama:
+
 - um pedido pode não ter um cliente (cliente não se identifica), por isso a cardinalidade mínima do lado cliente é zero;
 - nome e e-mail do cliente são atributos opcionais, mas, pelo menos, um deles precisa ser preenchido. O brModelo não tem uma funcionalidade específica para anotar esse tipo de situação: "os campos podem ser nulos, mas não ambos";
 - o brModelo também não tem a opção de linha dupla para as entidades com participação obrigatória no relacionamento, mas isso pode ser facilmente deduzido pela cardinalidade;
@@ -98,6 +107,7 @@ Alguns pontos a destacar nesse diagrama:
 No modelo lógico utilizaremos a notação de Chen, também conhecida como "notação pé de galinha".
 O diagrama abaixo foi feito utilizando o MySQL BenchMark.
 As principais mudanças são:
+
 - a entidade Categoria do modelo anterior virou um campo do tipo "enum". Como temos poucas categorias, o enum permite ter um ganho de desempenho nas consultas e escritas do banco de dados, além de simplificar o esquema.
 - a entidade Pagamento foi incorporada pela entidade pedido. Como o relacionamento era 1 para 1, não faz sentido ter tabelas separadas.
 

@@ -13,14 +13,14 @@ Link do projeto no GitHub:
 
 - [Objetivos](#objetivos)
 - [Requisitos](#requisitos)
-  - [Aplicação](#aplicacao)
+  - [Aplicação](#aplicação)
   - [Arquitetura](#arquitetura)
   - [Pipeline](#pipeline)
 - [Banco de dados](#banco-de-dados)
   - [Escolha e justificativa](#escolha-e-justificativa)
-  - [Documentação](#documentacao)
+  - [Documentação](#documentação)
     - [Modelo conceitual](#modelo-conceitual)
-    - [Modelo lógico](#modelo-logico)
+    - [Modelo lógico](#modelo-lógico)
 
 ## Objetivos
 

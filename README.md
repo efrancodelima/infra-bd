@@ -13,14 +13,14 @@ Link do projeto no GitHub:
 
 - [Objetivos](#objetivos)
 - [Requisitos do negócio](#requisitos-do-negocio)
-- [API's web](#apis-web)
-- [Arquitetura](#arquitetura)
-- [Pipeline](#pipeline)
+  - [API's web](#apis-web)
+  - [Arquitetura](#arquitetura)
+  - [Pipeline](#pipeline)
 - [Banco de dados](#banco-de-dados)
-- [Escolha e justificativa](#escolha-e-justificativa)
-- [Documentação](#documentacao)
-- [Modelo conceitual](#modelo-conceitual)
-- [Modelo lógico](#modelo-logico)
+  - [Escolha e justificativa](#escolha-e-justificativa)
+  - [Documentação](#documentacao)
+    - [Modelo conceitual](#modelo-conceitual)
+    - [Modelo lógico](#modelo-logico)
 
 ## Objetivos
 

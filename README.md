@@ -86,7 +86,7 @@ O SGBD escolhido foi o Amazon Aurora (engine MySQL). Como a aplicação também 
 
 #### Modelo conceitual
 
-Iremos utilizar o Diagrama Entidade Relacionamento (DER) para representar o modelo conceitual do nosso banco de dados.
+Utilizamos o Diagrama Entidade Relacionamento (DER) para representar o modelo conceitual do nosso banco de dados.
 
 Esse diagrama está mais próximo da visão do usuário do sistema e mais distante da implementação de fato (modelo físico).
 
@@ -99,13 +99,16 @@ Alguns pontos a destacar nesse diagrama:
 - um pedido pode não ter um cliente (cliente não se identifica), por isso a cardinalidade mínima do lado cliente é zero;
 - nome e e-mail do cliente são atributos opcionais, mas, pelo menos, um deles precisa ser preenchido. O brModelo não tem uma funcionalidade específica para anotar esse tipo de situação: "os campos podem ser nulos, mas não ambos";
 - o brModelo também não tem a opção de linha dupla para as entidades com participação obrigatória no relacionamento, mas isso pode ser facilmente deduzido pela cardinalidade;
-- na entidade Pedido, o "timestamp status" e o "timestamp checkout" podem ser usados para acompanhar o tempo de espera do pedido. Poderíamos também ter feito uma entidade "Histórico do pedido" registrando o avanço do pedido em cada etapa. Tem várias formas de modelar uma solução, nós optamos pela forma mais simples e que atende aos requisitos do projeto;
+- o timestamp do checkout poderia ser um atributo opcional, indicando, quando ausente, que o checkout não foi realizado. No nosso caso, como o pedido só é gravado no banco de dados quando o cliente faz o checkout, faz mais sentido deixá-lo como atributo obrigatório mesmo;
+- na entidade Pedido, o timestamp do status e o timestamp do checkout podem ser usados para acompanhar o tempo de espera do pedido. Poderíamos também ter feito uma entidade "Histórico do pedido" registrando o avanço do pedido em cada etapa. Tem várias formas de modelar uma solução, nós optamos pela forma mais simples dentre aquelas que atendem aos requisitos do projeto;
 - Categoria do produto, pagamento do pedido e status do pedido: os três poderiam ser atributos ou entidades. A definição do que é uma entidade e do que é um atributo varia muito segundo a visão de quem modela, mas observando que "o modelo conceitual deve ser estar próximo da visão do usuário", escolhi deixar apenas o status do pedido como atributo.
 
 #### Modelo lógico
 
-No modelo lógico utilizaremos a notação de Chen, também conhecida como "notação pé de galinha".
-O diagrama abaixo foi feito utilizando o MySQL BenchMark.
+No modelo lógico utilizamos a notação de Chen, também conhecida como "notação pé de galinha".
+
+O diagrama abaixo foi criado com o MySQL BenchMark.
+
 As principais mudanças são:
 
 - a entidade Categoria do modelo anterior virou um campo do tipo "enum". Como temos poucas categorias, o enum permite ter um ganho de desempenho nas consultas e escritas do banco de dados, além de simplificar o esquema.

@@ -1,11 +1,3 @@
-O que eu vou usar é o:
-Amazon RDS (Relational Database Service) para o service
-Amazon Aurora para o banco de dados relacional
-Aurora Cluster para o cluster do banco de dados
-
-O Amazon Aurora é um banco de dados compatível com MySQL e PostgreSQL.
-O cluster do banco de dados é diferente do cluster kubernetes: um é o Aurora Cluster e o outro é o EKS Cluster.
-
 # Tech Challenge - Fase 3
 
 Projeto realizado como atividade avaliativa do curso de **Software Architecture - Pós-Tech - FIAP**.
@@ -26,40 +18,12 @@ Link do projeto no GitHub:
 
 ## Objetivos
 
-Desenvolver um sistema para uma lanchonete, seguindo os pré-requisitos especificados no Tech Challenge.
+Desenvolver um sistema para uma lanchonete local em fase de expansão. O sistema deverá realizar o controle dos pedidos, além de outras funções correlatas, conforme especificado no Tech Challenge.
 
 ## Requisitos do negócio
 
-Em relação à fase anterior, foi feita a migração do projeto que antes rodava localmente (com o minikube) para a nuvem da Amazon Web Services (AWS).
-
-O projeto foi dividido em 4 partes:
-
-- uma função lambda para a autenticação do usuário
-- uma aplicação com as regras de negócio
-- a infraestrutura kubernetes para a aplicação
-- a infraestrutura para o banco de dados
-
-Cada parte tem um repositório separado no GitHub, conforme mencionado no início deste documento, e todos os repositórios necessitam pull request para realizar qualquer tipo de alteração na branch main.
-
-A branch main dispara um GitHub Action, que executa o deploy na AWS, criando ou atualizando os recursos. No caso da aplicação, ele também faz o build do arquivo jar, testa o código, faz o build da imagem docker, envia a imagem para o repositório ECR da Amazon (utilizando duas tags: a versão do projeto e a tag latest) e fez o deploy no cluster EKS.
-
-### Função Lambda
-
-Responsável pela autenticação do usuário, que deve se identificar pelo CPF.
-
-Para tal, foi utilizado o API Gateway, o Lambda e o Cognito.
-
-O Lambda também se comunica com o banco de dados para verificar se o CPF já está cadastrado.
-
-### Aplicação
-
-No que diz respeito ao software, o projeto foi desenvolvido em Java (JDK 17) seguindo os princípios da Clean Architecture.
-
-A única alteração no código em relação à fasse anterior é que, como o banco de dados migrou do MySQL para o Amazon Aurora, alguns ajustes foram necessários na configuração do Springboot e nos repositórios.
-
-#### API da aplicação
-
-Não houve mudanças em relação à fase anterior.
+### API's web
+A aplicação deverá oferecer a seguinte API para consumo:
 
 Cliente
 
@@ -81,74 +45,62 @@ Pedido
 - Pedidos mais antigos primeiro e mais novos depois.
 - Pedidos finalizados não devem aparecer na lista.
 
-### Infraestrutura kubernetes
+### Arquitetura
 
-Foi criado um EKS Cluster para rodar a aplicação. Dentro desse cluster temos o deployment, o service e o HPA.
+Arquitetura do software: utilizar a Clean Architecture.
 
-### Infraestrutura do banco de dados
+Arquitetura da infra: utilizar o kubernetes para rodar a aplicação, que deverá rodar na nuvem utilizando os serviços serverless. 
+O banco de dados do projeto deverá ser uma solução oferecida pela nuvem escolhida.
 
-O banco de dados escolhido foi o Amazon Aurora, que é do tipo relacional e compatível com MySQL e postgreSQL.
+### Pipeline
 
-Esse banco utiliza o Amazon RDS como service e roda dentro do Aurora Cluster (um cluster específico para banco de dados da AWS).
+O projeto foi dividido em 4 partes:
 
-## Instruções para executar a aplicação
+- uma função lambda para a autenticação do usuário
+- uma aplicação com as regras de negócio
+- a infraestrutura kubernetes para a aplicação
+- a infraestrutura para o banco de dados
 
-Sugestão de ordem para execução das APIs:
+Cada parte tem um repositório separado no GitHub, conforme mencionado no início deste documento, e todos os repositórios necessitam pull request para realizar qualquer tipo de alteração na branch main. As branchs main/master devem estar protegidas de forma a não permitir commits diretos.
 
-- Cadastrar cliente
-- Buscar cliente pelo CPF
-- Cadastrar produtos
-- Editar produto
-- Buscar produtos por categoria
-- Remover produtos (não remova todos, deixe pelo menos 1)
-- Fazer checkout
-- Consultar o status do pagamento
-- Mock da notificação do Mercado Pago \*
-- Atualizar o status do pedido
-- Listar pedidos
+Cada repositório deverá acionar o respectivo pipeline sempre que a branch main for alterada, realizando o deploy na nuvem escolhida.
 
-O status do pedido muda em uma ordem definida: recebido, em preparação, pronto, finalizado. Mas ele não avança se o pedido não tiver o pagamento aprovado, então é necessário realizar o mock da notificação do Mercado Pago antes de atualizar o status do pedido.
+## Banco de dados
+### Escolha e justificativa
 
-Exemplo de mock para a notificação do Mercado Pago usando o curl (você pode usar o Postman também, se preferir).
+Escolhemos trabalhar com o modelo relacional, principalmente pela consistência e integridade dos dados, características fundamentais para um controle preciso dos pedidos e dos pagamentos da lanchonete.
 
-```
-curl -X PUT <URL>/api/v2/pedidos/webhook/ \
--H "Content-Type: application/json" \
--d '{
-"id": 1,
-"date_created": "2024-09-30T11:26:38.000Z",
-"date_approved": "2024-09-30T11:26:38.000Z",
-"date_last_updated": "2024-09-30T11:26:38.000Z",
-"money_release_date": "2017-09-30T11:22:14.000Z",
-"payment_method_id": "Pix",
-"payment_type_id": "credit_card",
-"status": "approved",
-"status_detail": "accredited",
-"currency_id": "BRL",
-"description": "Pago Pizza",
-"collector_id": 2,
-"payer": {
-  "id": 123,
-  "email": "test_user_80507629@testuser.com",
-  "identification": {
-	"type": "CPF",
-	"number": 19119119100
-  },
-  "type": "customer"
-},
-"metadata": {},
-"additional_info": {},
-"external_reference": "MP0001",
-"transaction_amount": 250,
-"transaction_amount_refunded": 50,
-"coupon_amount": 15,
-"transaction_details": {
-  "net_received_amount": 250,
-  "total_paid_amount": 250,
-  "overpaid_amount": 0,
-  "installment_amount": 250
-},
-"installments": 1,
-"card": {}
-}'
-```
+Outra vantagem do modelo relacional é a sua maturidade: o modelo foi proposto em 1970 por Edgar F. Codd e desde então passou por diversas melhorias. Por estar há bastante tempo no mercado, é o modelo mais conhecido pelos profissionais de TI, sendo mais fácil encontrar mão de obra especializada para suporte e manutenção.
+
+O SGBD escolhido foi o Amazon Aurora (engine MySQL). Como a aplicação também está rodando na nuvem da AWS, vamos aproveitar a sinergia de usar um pacote de soluções do mesmo desenvolvedor. O Aurora possui desempenho suficiente para atender às necessidades do projeto, oferece escalabilidade sob demanda (cobrando apenas pelo que foi usado), alta disponibilidade, gerenciamento automático de instâncias, backups automáticos, cache de dados em memória RAM (InnoDB Buffer Pool) e diversas outras ferramentas que funcionam de forma transparente ao profissional de TI, diminuindo muito a carga de trabalho do administrador do banco de dados.
+
+### Documentação
+
+#### Modelo conceitual
+
+Iremos utilizar o Diagrama Entidade Relacionamento (DER) para representar o modelo conceitual do nosso banco de dados.
+
+Esse diagrama está mais próximo da visão do usuário do sistema e mais distante da implementação de fato (modelo físico).
+
+O diagrama abaixo foi feito utilizando o software brModelo.
+
+![Diagrama Entidade Relacionamento representando o Modelo Conceitual do banco de dados](./assets/modelo-conceitual.png)
+
+Alguns pontos a destacar nesse diagrama:
+- um pedido pode não ter um cliente (cliente não se identifica), por isso a cardinalidade mínima do lado cliente é zero;
+- nome e e-mail do cliente são atributos opcionais, mas, pelo menos, um deles precisa ser preenchido. O brModelo não tem uma funcionalidade específica para anotar esse tipo de situação: "os campos podem ser nulos, mas não ambos";
+- o brModelo também não tem a opção de linha dupla para as entidades com participação obrigatória no relacionamento, mas isso pode ser facilmente deduzido pela cardinalidade;
+- na entidade Pedido, o "timestamp status" e o "timestamp checkout" podem ser usados para acompanhar o tempo de espera do pedido. Poderíamos também ter feito uma entidade "Histórico do pedido" registrando o avanço do pedido em cada etapa. Tem várias formas de modelar uma solução, nós optamos pela forma mais simples e que atende aos requisitos do projeto;
+- Categoria do produto, pagamento do pedido e status do pedido: os três poderiam ser atributos ou entidades. A definição do que é uma entidade e do que é um atributo varia muito segundo a visão de quem modela, mas observando que "o modelo conceitual deve ser estar próximo da visão do usuário", escolhi deixar apenas o status do pedido como atributo.
+
+#### Modelo lógico
+
+No modelo lógico utilizaremos a notação de Chen, também conhecida como "notação pé de galinha".
+O diagrama abaixo foi feito utilizando o MySQL BenchMark.
+As principais mudanças são:
+- a entidade Categoria do modelo anterior virou um campo do tipo "enum". Como temos poucas categorias, o enum permite ter um ganho de desempenho nas consultas e escritas do banco de dados, além de simplificar o esquema.
+- a entidade Pagamento foi incorporada pela entidade pedido. Como o relacionamento era 1 para 1, não faz sentido ter tabelas separadas.
+
+![Diagrama do Modelo Lógico do banco de dados](./assets/modelo-logico.png)
+
+Na tabela "itens_pedido" a chave primária é composta pelas chaves primárias de pedido e produto, por isso as chaves aparecem em vermelho.

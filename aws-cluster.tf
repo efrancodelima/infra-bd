@@ -29,6 +29,12 @@ resource "aws_rds_cluster" "tf_aurora_cluster" {
   apply_immediately             = true
 
   lifecycle {
-    ignore_changes = [ availability_zones ]
+    ignore_changes = [
+      availability_zones,
+      apply_immediately,
+      enable_global_write_forwarding,
+      enable_local_write_forwarding,
+      master_password
+    ]
   }
 }

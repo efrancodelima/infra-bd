@@ -11,4 +11,11 @@ resource "aws_rds_cluster_instance" "tf_instance_writer" {
   depends_on = [
     aws_rds_cluster.tf_aurora_cluster
   ]
+
+  lifecycle {
+    ignore_changes = [
+      apply_immediately,
+      force_destroy
+    ]
+  }
 }

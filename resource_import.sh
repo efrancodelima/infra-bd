@@ -16,7 +16,7 @@ AURORA_CLUSTER_NAME="lanchonete-aurora-cluster"
 AURORA_CLUSTER_INSTANCE_NAME="lanchonete-aurora-cluster-instance-1"
 ROLE_NAME="lanchonete-aurora-role"
 POLICY_NAME="AmazonRDSFullAccess"
-SECURITY_GROUP_ID="sg-03dbcfa45d7ec9cba"
+SECURITY_GROUP_NAME="lanchonete-aurora-security-group"
 SUBNET_GROUP_NAME="lanchonete-aurora-subnet-group"
 
 # Importa o cluster aurora
@@ -33,6 +33,7 @@ import_resource "aws_iam_role_policy_attachment" "tf_rds_policy" \
 "${ROLE_NAME}/arn:aws:iam::aws:policy/${POLICY_NAME}"
 
 # Importa o security group
+SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=group-name,Values=${SECURITY_GROUP_NAME}" --query 'SecurityGroups[0].GroupId' --output text)
 import_resource "aws_security_group" "tf_aurora_security_group" "${SECURITY_GROUP_ID}"
 
 # Importa o subnet group

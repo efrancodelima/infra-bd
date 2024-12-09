@@ -1,4 +1,4 @@
-resource "aws_rds_cluster_instance" "tf_aurora_cluster_instance" {
+resource "aws_rds_cluster_instance" "tf_instance_writer" {
   cluster_identifier = aws_rds_cluster.tf_aurora_cluster.id
 
   instance_class      = "db.serverless"

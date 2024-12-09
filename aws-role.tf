@@ -1,4 +1,4 @@
-resource "aws_iam_role" "tf_aurora_role" {
+resource "aws_iam_role" "tf_role" {
   name = "lanchonete-aurora-role"
 
   assume_role_policy = jsonencode({

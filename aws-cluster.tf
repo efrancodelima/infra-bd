@@ -11,8 +11,8 @@ resource "aws_rds_cluster" "tf_aurora_cluster" {
   }
 
   db_subnet_group_name          = aws_db_subnet_group.tf_subnet_group.name
-  vpc_security_group_ids        = [ aws_security_group.tf_aurora_security_group.id ]
-  iam_roles                     = [aws_iam_role.tf_aurora_role.arn]
+  vpc_security_group_ids        = [ aws_security_group.tf_security_group.id ]
+  iam_roles                     = [aws_iam_role.tf_role.arn]
   
   database_name                 = "lanchonete"
   port                          = 3306

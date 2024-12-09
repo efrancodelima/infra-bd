@@ -3,10 +3,10 @@ resource "aws_rds_cluster" "tf_aurora_cluster" {
   availability_zones            = [var.aws_zone_1, var.aws_zone_2]
   
   engine                        = "aurora-mysql"
-  engine_version                = "8.0.mysql_aurora.3.05.2"
-  engine_mode                   = "serverless"
+  engine_version                = "8.0.mysql_aurora.3.08.0"
+  engine_mode                   = "provisioned"
   serverlessv2_scaling_configuration {
-    min_capacity = 0.5
+    min_capacity = 0
     max_capacity = 4
   }
 

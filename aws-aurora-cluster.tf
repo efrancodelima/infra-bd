@@ -3,8 +3,12 @@ resource "aws_rds_cluster" "tf_aurora_cluster" {
   availability_zones            = [var.aws_zone_1, var.aws_zone_2]
   
   engine                        = "aurora-mysql"
-  engine_mode                   = "provisioned"
   engine_version                = "8.0.mysql_aurora.3.05.2"
+  engine_mode                   = "serverless"
+  serverlessv2_scaling_configuration {
+    min_capacity = 0.5
+    max_capacity = 4
+  }
 
   db_subnet_group_name          = aws_db_subnet_group.tf_subnet_group.name
   vpc_security_group_ids        = [ aws_security_group.tf_aurora_security_group.id ]
@@ -23,11 +27,6 @@ resource "aws_rds_cluster" "tf_aurora_cluster" {
   deletion_protection           = false
   skip_final_snapshot           = true
   apply_immediately             = true
-
-  serverlessv2_scaling_configuration {
-    min_capacity = 0.5
-    max_capacity = 4
-  }
 
   lifecycle {
     ignore_changes = [ availability_zones ]

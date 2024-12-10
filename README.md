@@ -130,4 +130,4 @@ Na tabela "itens_pedido" a chave primária é composta pelas chaves primárias d
 
 ## Infra kubernetes
 
-A infra está rodando em um cluster ECS. Todos os recursos foram definidos com o Terraform, que tenta importar os recursos da AWS para a VM do GitHub Actions (que é onde a pipeline roda) antes de executar e "plan" e o "apply". Então, se o recurso não existe, ele cria, se já existe, ele atualiza.
+A infra está rodando em um cluster ECS. Todos os recursos foram definidos com o Terraform, que tenta importar os recursos da AWS para a VM do GitHub Actions (que é onde a pipeline roda) antes de executar o "plan" e o "apply". Então, se o recurso não existe, ele cria; se já existe, ele atualiza.

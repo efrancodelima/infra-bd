@@ -16,11 +16,13 @@ Link do projeto no GitHub:
   - [Aplicação](#aplicação)
   - [Arquitetura](#arquitetura)
   - [Pipeline](#pipeline)
+- [Aplicação](#aplicação)
 - [Banco de dados](#banco-de-dados)
   - [Escolha e justificativa](#escolha-e-justificativa)
   - [Documentação](#documentação)
     - [Modelo conceitual](#modelo-conceitual)
     - [Modelo lógico](#modelo-lógico)
+- [Infra kubernetes](#infra-kubernetes)
 
 ## Objetivos
 
@@ -72,6 +74,14 @@ Cada parte tem um repositório separado no GitHub, conforme mencionado no iníci
 
 Cada repositório deverá acionar o respectivo pipeline sempre que a branch main for alterada, realizando o deploy na nuvem escolhida.
 
+## Aplicação
+
+A aplicação não mudou em relação à fase anterior, mas foi criada uma pipeline que antes não existia.
+
+Essa pipeline compila o projeto em um arquivo jar, executa os testes, compila o projeto em uma imagem docker, faz o login/push/logout na AWS ECR e por fim o deploy na infra kubernetes. O logout é feito sempre que o login for bem sucedido, mesmo que o push falhe.
+
+O push é feito duas vezes, uma com a tag igual à versão do projeto e outra com a tag latest. O repositório ECR é do tipo mutável, já que a tag latest precisa ser substituída a cada nova versão, mas na pipeline foi adicionado um script bash que impede que o primeiro push substitua uma versão já existente do projeto. Exemplificando: se já existe uma imagem com a tag "2.0.5" no ECR, a pipeline não permite subir outra imagem com a mesma tag; mas a tag latest ela permite subir quantas vezes for necessário.
+
 ## Banco de dados
 
 ### Escolha e justificativa
@@ -117,3 +127,7 @@ As principais mudanças são:
 ![Diagrama do Modelo Lógico do banco de dados](./assets/modelo-logico.png)
 
 Na tabela "itens_pedido" a chave primária é composta pelas chaves primárias de pedido e produto, por isso as chaves aparecem em vermelho.
+
+## Infra kubernetes
+
+A infra está rodando em um cluster ECS. Todos os recursos foram definidos com o Terraform, que tenta importar os recursos da AWS para a VM do GitHub Actions (que é onde a pipeline roda) antes de executar e "plan" e o "apply". Então, se o recurso não existe, ele cria, se já existe, ele atualiza.

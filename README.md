@@ -130,6 +130,20 @@ Na tabela "itens_pedido" a chave primária é composta pelas chaves primárias d
 
 ## Infra kubernetes
 
-A infra está rodando em um cluster ECS. Esse cluster roda apenas em subnets privadas e não tem um IP público atribuído.
+A infra está rodando em um cluster ECS. Esse cluster roda apenas em subnets privadas e não tem um IP público atribuído, sendo acessado por um API Gateway.
 
-Todos os recursos foram definidos com o Terraform, que tenta importar os recursos da AWS para a VM do GitHub Actions (que é onde a pipeline roda) antes de executar o "plan" e o "apply". Então, se o recurso não existe, ele cria; se já existe, ele atualiza.
+Os recursos foram criados mais ou menos nessa ordem, respeitando as dependências entre eles (cláusula depends_on):
+- os securities groups do cluster ECS e do load balancer;
+- as roles da task e da task execution;
+- as policies attachments (políticas associadas às roles);
+- o cluster ECS;
+- a task definition;
+- o load balancer;
+- o target group;
+- o listener;
+- o service do cluster;
+- o VPC link
+- o API Gateway;
+- o stage, a integration e a route do API Gateway.
+
+Todos os recursos foram definidos com o Terraform, que tenta importar os recursos da AWS para a VM do GitHub Actions (que é onde a pipeline roda) antes de executar o "plan" e o "apply". Então, se o recurso não existe, ele cria; se já existe, ele atualiza. Ao final da pipeline, ele imprime no console o link direto para a aplicação usando um output do terraform.

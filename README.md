@@ -13,10 +13,11 @@ Link do projeto no GitHub:
 
 - [Objetivos](#objetivos)
 - [Requisitos](#requisitos)
-  - [Aplicação](#aplicação)
+  - [API Web](#api-web)
   - [Arquitetura](#arquitetura)
   - [Pipeline](#pipeline)
 - [Aplicação](#aplicação)
+  - [Instrução para rodar a aplicação](#instrução-para-rodar-a-aplicação)
 - [Banco de dados](#banco-de-dados)
   - [Escolha e justificativa](#escolha-e-justificativa)
   - [Documentação](#documentação)
@@ -30,7 +31,7 @@ Desenvolver um sistema para uma lanchonete local em fase de expansão. O sistema
 
 ## Requisitos
 
-### Aplicação
+### API Web
 
 A aplicação deverá oferecer a seguinte API web para consumo:
 
@@ -82,6 +83,70 @@ Essa pipeline compila o projeto em um arquivo jar, executa os testes, compila o 
 
 O push é feito duas vezes, uma com a tag igual à versão do projeto e outra com a tag latest. O repositório ECR é do tipo mutável, já que a tag latest precisa ser substituída a cada nova versão, mas na pipeline foi adicionado um script bash que impede que o primeiro push substitua uma versão já existente do projeto. Exemplificando: se já existe uma imagem com a tag "2.0.5" no ECR, a pipeline não permite subir outra imagem com a mesma tag; mas a tag latest ela permite subir quantas vezes for necessário.
 
+### Instrução para rodar a aplicação
+
+Primeiro, é necessário fazer o deploy, nessa ordem, da infra do banco de dados, da infra kubernetes, da aplicação e, por fim, da lambda.
+
+Sugestão de ordem para execução das APIs:
+
+- Cadastrar cliente
+- Buscar cliente pelo CPF
+- Cadastrar produtos
+- Editar produto
+- Buscar produtos por categoria
+- Remover produtos (não remova todos, deixe pelo menos 1)
+- Fazer checkout
+- Consultar o status do pagamento
+- Mock da notificação do Mercado Pago \*
+- Atualizar o status do pedido
+- Listar pedidos
+
+O status do pedido muda em uma ordem definida: recebido, em preparação, pronto, finalizado. Mas ele não avança se o pedido não tiver o pagamento aprovado, então é necessário realizar o mock da notificação do Mercado Pago antes de atualizar o status do pedido.
+
+Exemplo de mock para a notificação do Mercado Pago usando o curl (você pode usar o Postman também, se preferir).
+
+```
+curl -X PUT <URL>/api/v2/pedidos/webhook/ \
+-H "Content-Type: application/json" \
+-d '{
+"id": 1,
+"date_created": "2024-09-30T11:26:38.000Z",
+"date_approved": "2024-09-30T11:26:38.000Z",
+"date_last_updated": "2024-09-30T11:26:38.000Z",
+"money_release_date": "2017-09-30T11:22:14.000Z",
+"payment_method_id": "Pix",
+"payment_type_id": "credit_card",
+"status": "approved",
+"status_detail": "accredited",
+"currency_id": "BRL",
+"description": "Pago Pizza",
+"collector_id": 2,
+"payer": {
+  "id": 123,
+  "email": "test_user_80507629@testuser.com",
+  "identification": {
+	"type": "CPF",
+	"number": 19119119100
+  },
+  "type": "customer"
+},
+"metadata": {},
+"additional_info": {},
+"external_reference": "MP0001",
+"transaction_amount": 250,
+"transaction_amount_refunded": 50,
+"coupon_amount": 15,
+"transaction_details": {
+  "net_received_amount": 250,
+  "total_paid_amount": 250,
+  "overpaid_amount": 0,
+  "installment_amount": 250
+},
+"installments": 1,
+"card": {}
+}'
+```
+
 ## Banco de dados
 
 ### Escolha e justificativa
@@ -130,20 +195,26 @@ Na tabela "itens_pedido" a chave primária é composta pelas chaves primárias d
 
 ## Infra kubernetes
 
-A infra está rodando em um cluster ECS. Esse cluster roda apenas em subnets privadas e não tem um IP público atribuído, sendo acessado por um API Gateway.
+A infra está rodando em um cluster ECS. Esse cluster roda apenas em subnets privadas e não tem um IP público atribuído, sendo acessado por um API Gateway (que exige autenticação).
 
 Os recursos foram criados mais ou menos nessa ordem, respeitando as dependências entre eles (cláusula depends_on):
+
 - os securities groups do cluster ECS e do load balancer;
 - as roles da task e da task execution;
 - as policies attachments (políticas associadas às roles);
 - o cluster ECS;
+  - o service do cluster ECS;
 - a task definition;
 - o load balancer;
-- o target group;
-- o listener;
-- o service do cluster;
+  - o target group do load balancer;
+  - o listener do load balancer;
 - o VPC link
 - o API Gateway;
-- o stage, a integration e a route do API Gateway.
+  - o stage do API Gateway;
+  - a integration do API Gateway;
+  - o authorizer do API Gateway;
+  - a route do API Gateway.
 
-Todos os recursos foram definidos com o Terraform, que tenta importar os recursos da AWS para a VM do GitHub Actions (que é onde a pipeline roda) antes de executar o "plan" e o "apply". Então, se o recurso não existe, ele cria; se já existe, ele atualiza. Ao final da pipeline, ele imprime no console o link direto para a aplicação usando um output do terraform.
+Todos os recursos foram definidos com o Terraform, que tenta importar os recursos da AWS para a VM do GitHub Actions (que é onde a pipeline roda) antes de executar o "plan" e o "apply". Então, se o recurso não existe, ele cria; se já existe, ele atualiza.
+
+Ao final da pipeline, ele imprime no console (do Action) o link para o API Gateway usando um output do terraform. Mas reforçando: o API Gateway exige autenticação, então esse link não estará acessível diretamente.

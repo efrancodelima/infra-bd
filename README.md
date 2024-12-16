@@ -195,7 +195,7 @@ Na tabela "itens_pedido" a chave primária é composta pelas chaves primárias d
 
 ## Infra kubernetes
 
-A infra está rodando em um cluster ECS. Esse cluster roda apenas em subnets privadas e não tem um IP público atribuído, sendo acessado por um API Gateway.
+A infra está rodando em um cluster ECS. Esse cluster roda apenas em subnets privadas e não tem um IP público atribuído, sendo acessado por um API Gateway (que exige autenticação).
 
 Os recursos foram criados mais ou menos nessa ordem, respeitando as dependências entre eles (cláusula depends_on):
 
@@ -203,13 +203,18 @@ Os recursos foram criados mais ou menos nessa ordem, respeitando as dependência
 - as roles da task e da task execution;
 - as policies attachments (políticas associadas às roles);
 - o cluster ECS;
+  - o service do cluster ECS;
 - a task definition;
 - o load balancer;
-- o target group;
-- o listener;
-- o service do cluster;
+  - o target group do load balancer;
+  - o listener do load balancer;
 - o VPC link
 - o API Gateway;
-- o stage, a integration e a route do API Gateway.
+  - o stage do API Gateway;
+  - a integration do API Gateway;
+  - o authorizer do API Gateway;
+  - a route do API Gateway.
 
-Todos os recursos foram definidos com o Terraform, que tenta importar os recursos da AWS para a VM do GitHub Actions (que é onde a pipeline roda) antes de executar o "plan" e o "apply". Então, se o recurso não existe, ele cria; se já existe, ele atualiza. Ao final da pipeline, ele imprime no console o link direto para a aplicação usando um output do terraform.
+Todos os recursos foram definidos com o Terraform, que tenta importar os recursos da AWS para a VM do GitHub Actions (que é onde a pipeline roda) antes de executar o "plan" e o "apply". Então, se o recurso não existe, ele cria; se já existe, ele atualiza.
+
+Ao final da pipeline, ele imprime no console (do Action) o link para o API Gateway usando um output do terraform. Mas reforçando: o API Gateway exige autenticação, então esse link não estará acessível diretamente.

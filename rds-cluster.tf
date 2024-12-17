@@ -1,6 +1,6 @@
 resource "aws_rds_cluster" "tf_aurora_cluster" {
   cluster_identifier            = "lanchonete-aurora-cluster"
-  availability_zones            = [var.aws_zone_1, var.aws_zone_2]
+  availability_zones            = ["us-east-1a", "us-east-1b"]
   
   engine                        = "aurora-mysql"
   engine_version                = "8.0.mysql_aurora.3.08.0"
